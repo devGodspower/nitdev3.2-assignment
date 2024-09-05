@@ -1,14 +1,16 @@
-import express  from'express'
-import {users} from "./users.js"
+import express  from'express';
+import {users} from "./users.js";
 import fs from "fs";
+import {config} from "./config/env.js";
+import {createUserTable} from "./user/user.model.js";
 
 const app = express();
-const port = 3600;
+
 app.use(express.json());
-/*app.use(express.urlencoded({extended:true}));*/
 
 
-//const hostname = 'localhost';//
+
+
 
 const logger = (req,res,next) => {
   const id = parseInt(req.params.id);
@@ -126,6 +128,7 @@ return res.status(201).json({
   data: req.body
 });
   });
-app.listen(port,()=>{
-  console.log(`server is listening on ${port} `)
+app.listen(config.port,()=>{
+  createUserTable();
+  console.log(`server is listening on ${config.port} `)
 });
