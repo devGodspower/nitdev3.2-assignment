@@ -3,10 +3,14 @@ import {users} from "./users.js";
 import fs from "fs";
 import {config} from "./config/env.js";
 import {createUserTable} from "./user/user.model.js";
+import { createAccountTable } from './acccount/account.model.js';
+import { signup } from './user/user.controller.js';
 
 const app = express();
 
 app.use(express.json());
+
+app.post("/signup", signup);
 
 
 
@@ -97,38 +101,39 @@ return  res.json({
   
 
 
- app.post("/signup",validateUsername,validateEmail,validateUserAge,(req,res)=>{
-  console.log(req.body);
-  const { username,email,password,Age } = req.body;
-  const id = users.length + 1;
-  const  newUser = {
-    id,
-    username,
-    email,
-    password,
-    Age
-  };
+//  app.post("/signup",validateUsername,validateEmail,validateUserAge,(req,res)=>{
+//   console.log(req.body);
+//   const { username,email,password,Age } = req.body;
+//   const id = users.length + 1;
+//   const  newUser = {
+//     id,
+//     username,
+//     email,
+//     password,
+//     Age
+//   };
  
- users.push(newUser);
+//  users.push(newUser);
 
- const stringUsers = JSON.stringify(users);
-
-
-
- fs.writeFileSync(
-  "C:/Users/GLR/Desktop/Nit-dev-project-3.3/src/users.js",
-  `export let users = ${stringUsers}`
- );
+//  const stringUsers = JSON.stringify(users);
 
 
 
-return res.status(201).json({
-  message :'user has been created',
-  // data: JSON.parse(stringUsers),
-  data: req.body
-});
-  });
-app.listen(config.port,()=>{
-  createUserTable();
+//  fs.writeFileSync(
+//   "C:/Users/GLR/Desktop/Nit-dev-project-3.3/src/users.js",
+//   `export let users = ${stringUsers}`
+//  );
+
+
+
+// return res.status(201).json({
+//   message :'user has been created',
+//   // data: JSON.parse(stringUsers),
+//   data: req.body
+// });
+//   });
+app.listen(config.port,async()=>{
+  await createUserTable();
+  await createAccountTable();
   console.log(`server is listening on ${config.port} `)
 });
