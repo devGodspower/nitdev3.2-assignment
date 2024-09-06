@@ -1,22 +1,26 @@
 import express  from'express';
-import {users} from "./users.js";
-import fs from "fs";
 import {config} from "./config/env.js";
-import {createUserTable} from "./user/user.model.js";
+import {createUserTables} from "./user/user.model.js";
 import { createAccountTable } from './acccount/account.model.js';
-import { signup } from './user/user.controller.js';
+import { signup,userid,allusers,deleteid,updateUser } from './user/user.controller.js';
+
+
+;
 
 const app = express();
 
 app.use(express.json());
 
 app.post("/signup", signup);
+app.get("/getuser",userid);
+app.get("/users",allusers);
+app.delete("/deleteuser",deleteid);
+app.put("/updateuser",updateUser)
 
 
 
 
-
-const logger = (req,res,next) => {
+/*const logger = (req,res,next) => {
   const id = parseInt(req.params.id);
 
   if(id < 1) {
@@ -63,9 +67,9 @@ const logger = (req,res,next) => {
       
       }
       next();
-    }
+    }*/
     //get all users
-app.get("/get-users",(req,res)=>{
+/*app.get("/get-users",(req,res)=>{
   return res.json({
     message:"this are the the users",
     data:users
@@ -97,7 +101,7 @@ return  res.json({
     message:'this is the user',
     data: user
   });
-});
+});*/
   
 
 
@@ -133,7 +137,11 @@ return  res.json({
 // });
 //   });
 app.listen(config.port,async()=>{
-  await createUserTable();
+  await createUserTables();
   await createAccountTable();
+  
+ 
+  
+
   console.log(`server is listening on ${config.port} `)
 });
