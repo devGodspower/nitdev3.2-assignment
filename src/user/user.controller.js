@@ -1,4 +1,6 @@
-import { createUser, getuserbyid, getallusers,deleteByid, update} from "./user.services.js";
+import { createUser, getuserbyid, getallusers,deleteByid, update,getUserByEmail} from "./user.services.js";
+import { signupSchema } from "./user.validator.js";
+import { hashPassword } from "./utils/bcrypt.js";
 
 
 
@@ -6,14 +8,27 @@ import { createUser, getuserbyid, getallusers,deleteByid, update} from "./user.s
 
 
 export const signup =async (req, res) =>{
+  const {error,value} = signupSchema.validate(req.body)
 
-    const { firstName,lastName, email, password } = req.body;
+  if(error)return res.status(400).json({
+    message : error.details[0].message
+  })
 
-    const userdetails = await createUser(firstName,lastName, email, password);
+    const { firstName,lastName, email, password } = value;
+    const hashedPassword = await hashPassword(password)
+    console.log(hashedPassword)
+    const userExists =  await getUserByEmail(email);
+
+    if (userExists.length > 0) return res.status(409).json({
+        message:` User with email ${email} already exists`
+    })
+    
+
+    const userdetails = await createUser(firstName,lastName, email, hashedPassword);
 
     return res.status(200).json({
       "message": "user created",
-      userdetails
+      data : userdetails
     })
   }
     
@@ -29,8 +44,8 @@ export const userid = async (req, res) =>{
   
 
   return res.status(200).json({
-    "message": "user id found",
-    user
+    "message": `user id found ${id}`,
+    user 
   }
 )}
 export const allusers = async (req, res) =>{
@@ -43,15 +58,20 @@ export const allusers = async (req, res) =>{
     users
   }
 )}
-export const deleteid = async (req,res) =>{
-  const {id} = req.params;
-  const user = await deleteByid();
+export const deleteid = async (req , res) => {
+  const { id } = req.params;
 
-  return res.status(200).json({
-    "message":"userid deleted",
-    user
-  }) 
-}
+  
+      const user = await deleteByid(id);
+
+      return res.status(200).json({
+          message: `User deleted successfully ${id}`,
+          user
+      });
+    }
+  
+
+
 export const updateUser= async (req,res) =>{
   const {id} = req.params;
   const user = await update();
@@ -59,5 +79,5 @@ export const updateUser= async (req,res) =>{
   return res.status(200).json({
     "message":"userid deleted ${id} ",
     user
-  }) 
+  })
 }

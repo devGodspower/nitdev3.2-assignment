@@ -12,10 +12,10 @@ const app = express();
 app.use(express.json());
 
 app.post("/signup", signup);
-app.get("/getuser",userid);
+app.get("/getuser/:id",userid);
 app.get("/users",allusers);
-app.delete("/deleteuser",deleteid);
-app.put("/updateuser",updateUser)
+app.delete("/deleteuser/:id",deleteid);
+app.put("/updateuser",updateUser);
 
 
 

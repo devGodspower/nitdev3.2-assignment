@@ -13,23 +13,19 @@ const pool = new Pool({
 });
 
 
-export const executeQuery = (query, values = []) => {
+export const executeQuery = async(query, values = []) => {
 
-    return new Promise((resolve, reject) => {
-        pool.connect((err, client, done) => {
-            if (err) {
+    const client = await pool.connect();
+    try{
+        const result = await client.query(query,values);
+        return result.rows 
+        
+
+        }catch (error){
+            console.error ("error executing query",error);
+        }
                 console.error("Error creating database connection", err);
                 return reject(err);
             }
 
-            client.query(query, values, (err, results) => {
-                done();
-                if (err) {
-                    console.error("Error executing query", err);
-                    return reject(err);
-                }
-                return resolve(results.rows);
-            })
-        })
-    })
-}
+            

@@ -11,19 +11,30 @@ export const createUser = async (firstName,lastName, email, password) => {
 
           return result
         } catch (error) {
-          console.error("error inserting into users!!", err);
+          console.error("error inserting into users!!", error);
           
         }
       }
+      export const getUserByEmail = async(email) =>{
+        try {
+            const query = `SELECT * FROM users WHERE email = $1`;
+    
+            const res = await executeQuery(query, [email]);
+    
+            return res
+        } catch (error) {
+            
+        }
+    }
 
       export const getuserbyid = async (id) => {
         try {
           const query = `SELECT * FROM users WHERE id = $1;`;
           const result = await executeQuery(query, [id]);
           return result
-        } catch (err) {
-          console.error('Error fetching user by ID:', err);
-          throw err; 
+        } catch (error) {
+          console.log('Error fetching user by ID:', error);
+           
         }
       };
       
@@ -31,12 +42,12 @@ export const createUser = async (firstName,lastName, email, password) => {
 export const getallusers = async () => {
           try {
             
-            const query =`SELECT * FROM users ;`
+            const query =`SELECT * FROM users ORDER By id ASC ;`
             const res = await executeQuery(query);
             return res
             } 
-            catch (err) {
-            console.error('Error fetching users:', err);
+            catch (error) {
+            console.error('Error fetching users:', error);
           
         }}
 export const deleteByid= async (id) => {
@@ -45,14 +56,19 @@ export const deleteByid= async (id) => {
           
 
           
-          const query =`DELETE FROM users WHERE id = $1;`;
+          const query =`DELETE FROM users WHERE id = $1 RETURNING *;`;
           
           
-          const res = await executeQuery(query, [id]);}
+          const res = await executeQuery(query, [id]);
+          
+        return res.rows;
+          
+        }
 
         
-      catch (err) {
-          console.error('Error deleting user:', err);
+      catch (error) {
+          console.error('Error deleting user:', error);
+          
         
 }}
 
@@ -68,7 +84,7 @@ try {
   await executeQuery(query);
   console.log(" data type updated");
 } catch (error) {
-  console.error("Error updating data type", err);
+  console.error("Error updating data type", error);
   }
 }
 
