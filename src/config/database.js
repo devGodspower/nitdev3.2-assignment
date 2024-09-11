@@ -15,8 +15,9 @@ const pool = new Pool({
 
 export const executeQuery = async(query, values = []) => {
 
-    const client = await pool.connect();
+    
     try{
+        const client = await pool.connect();
         const result = await client.query(query,values);
         return result.rows 
         
@@ -24,8 +25,24 @@ export const executeQuery = async(query, values = []) => {
         }catch (error){
             console.error ("error executing query",error);
         }
-                console.error("Error creating database connection", err);
-                return reject(err);
             }
-
+            
+// export const executeQuery = (query, values = []) => {
+//     return new Promise((resolve, reject) => {
+//         pool.connect((err, client , done ) => {
+//             if (err) {
+//                 console.error("error creating database connection", err);
+//                 return reject(err);
+//             }
+//             client.query(query, values, (err, results) => {
+//                 done();
+//                 if(err){
+//                     console.error("error executing query",err);
+//                     return reject(err);
+//                 }
+//                 return resolve(results.rows)
+//             })
+//         })
+//     })
+// }
             

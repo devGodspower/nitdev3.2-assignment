@@ -1,10 +1,8 @@
 import { createUser, getuserbyid, getallusers,deleteByid, update,getUserByEmail} from "./user.services.js";
-import { signupSchema } from "./user.validator.js";
-import { hashPassword } from "./utils/bcrypt.js";
-
-
-
-
+import { signupSchema, signinSchema } from "./user.validator.js";
+import { hashPassword, comparePassword } from "../utils/bcrypt.js";
+import { sanitize } from "../utils/sanitizeUser.js";
+import { generateToken } from "../utils/jwt.js";
 
 
 export const signup =async (req, res) =>{
@@ -15,8 +13,11 @@ export const signup =async (req, res) =>{
   })
 
     const { firstName,lastName, email, password } = value;
-    const hashedPassword = await hashPassword(password)
+
+        const hashedPassword = await hashPassword(password)
+
     console.log(hashedPassword)
+
     const userExists =  await getUserByEmail(email);
 
     if (userExists.length > 0) return res.status(409).json({
@@ -24,11 +25,11 @@ export const signup =async (req, res) =>{
     })
     
 
-    const userdetails = await createUser(firstName,lastName, email, hashedPassword);
+    const [userdetails] = await createUser(firstName,lastName, email, hashedPassword);
 
     return res.status(200).json({
       "message": "user created",
-      data : userdetails
+      data : sanitize(userdetails)
     })
   }
     
@@ -80,4 +81,38 @@ export const updateUser= async (req,res) =>{
     "message":"userid deleted ${id} ",
     user
   })
+}
+
+
+export const signin = async (req, res) =>{
+
+  const {error, value} = signinSchema.validate(req.body)
+
+  if (error) return res.status(400).json({
+    message: error.details[0].message
+  })
+
+  const {email, password} = value;
+
+
+  const [user] = await getUserByEmail(email)
+
+
+  if (!user) return res.status(404).json({
+    message: "No user with this email!!"
+  })
+
+  const isMatch = await comparePassword(password, user.password)
+
+  if(!isMatch) return res.status(403).json({
+    message: "Invalid credentials"
+  })
+
+  const accessToken = generateToken(sanitize(user))
+
+  return res.status(200).json({
+    message: "user loggedin successfully",
+    accessToken: accessToken
+  })
+
 }

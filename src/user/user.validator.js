@@ -1,9 +1,5 @@
-
-
+import Joi from 'joi';
 import joi from 'joi';
-
-
-
 
 
 export const signupSchema = joi.object({
@@ -38,3 +34,8 @@ export const signupSchema = joi.object({
       'any.required': 'Password is required'
     })
 });
+
+export const signinSchema = joi.object({
+  email: joi.string().email().required(),
+  password: joi.string().required()
+})

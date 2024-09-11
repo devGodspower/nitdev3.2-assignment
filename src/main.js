@@ -2,16 +2,17 @@ import express  from'express';
 import {config} from "./config/env.js";
 import {createUserTables} from "./user/user.model.js";
 import { createAccountTable } from './acccount/account.model.js';
-import { signup,userid,allusers,deleteid,updateUser } from './user/user.controller.js';
+import { signup,signin,userid,allusers,deleteid,updateUser } from './user/user.controller.js';
 
 
-;
+
 
 const app = express();
 
 app.use(express.json());
 
 app.post("/signup", signup);
+app.post("/signin", signin);
 app.get("/getuser/:id",userid);
 app.get("/users",allusers);
 app.delete("/deleteuser/:id",deleteid);
