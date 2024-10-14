@@ -4,7 +4,7 @@ import { config } from "./env.js"
 const { Pool } = pkg;
 
 const pool = new Pool({
-    max: 100,
+    max: 200,
     host: config.db.host,
     user: config.db.user,
     database: config.db.name,
@@ -14,17 +14,21 @@ const pool = new Pool({
 
 
 export const executeQuery = async(query, values = []) => {
-
+    let client;
     
     try{
-        const client = await pool.connect();
+         client = await pool.connect();
         const result = await client.query(query,values);
         return result.rows 
         
 
         }catch (error){
-            console.error ("error executing query",error);
+            console.error("error executing query",error.message);
+    }finally {
+        if (client){
+            client.release();
         }
+    }
             }
             
 // export const executeQuery = (query, values = []) => {

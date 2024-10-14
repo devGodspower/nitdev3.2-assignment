@@ -1,15 +1,19 @@
 import { executeQuery } from "../config/database.js";
+import {v4 as uuidv4} from 'uuid'
 
 
 
-export const createUser = async (firstName,lastName, email, password) => {
+
+
+export const createUser = async (firstName,lastName, email, password,phonenumber) => {
         try {
-          const query = `INSERT INTO users (firstName,lastName, email, password) VALUES ($1, $2, $3, $4) RETURNING *`
-          const result = await executeQuery(query, [firstName,lastName, email, password]);
+          const userId = uuidv4()
+          const query = `INSERT INTO users (userId,firstName,lastName, email, password,phonenumber,created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *`
+          const result = await executeQuery(query, [userId,firstName,lastName, email, password,phonenumber]);
 
-          console.log(result, query)
+          return result;
 
-          return result
+          
         } catch (error) {
           console.error("error inserting into users!!", error);
           
@@ -26,10 +30,22 @@ export const createUser = async (firstName,lastName, email, password) => {
             
         }
     }
+    export const getUserByPhoneNumber = async(phonenumber) =>{
+      try {
+          const query = `SELECT * FROM users WHERE phonenumber = $1;`
+  
+          const res = await executeQuery(query, [phonenumber]);
+      
+          return res
+          
+      } catch (error) {
+          throw new Error(error)
+      }
+  }
 
       export const getuserbyid = async (id) => {
         try {
-          const query = `SELECT * FROM users WHERE id = $1;`;
+          const query = `SELECT * FROM users WHERE userId = $1;`;
           const result = await executeQuery(query, [id]);
           return result
         } catch (error) {
@@ -42,7 +58,7 @@ export const createUser = async (firstName,lastName, email, password) => {
 export const getallusers = async () => {
           try {
             
-            const query =`SELECT * FROM users ORDER By id ASC ;`
+            const query =`SELECT * FROM users ORDER By userId ASC ;`
             const res = await executeQuery(query);
             return res
             } 
@@ -56,12 +72,12 @@ export const deleteByid= async (id) => {
           
 
           
-          const query =`DELETE FROM users WHERE id = $1 RETURNING *;`;
+          const query =`DELETE FROM users WHERE userid = $1 RETURNING *;`;
           
           
           const res = await executeQuery(query, [id]);
           
-        return res.rows;
+        return res;
           
         }
 

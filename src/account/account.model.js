@@ -3,10 +3,13 @@ import { executeQuery} from "../config/database.js";
 export const createAccountTable = async ()  => {
   const query = `
   CREATE TABLE IF NOT EXISTS accounts(
-  id SERIAL primary key ,
-  user_id SERIAL,
-  FOREIGN KEY (user_id) REFERENCES users(id),
+  accountId UUID primary key,
+  userId UUID,
+  FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE,
   accountNumber VARCHAR(10) UNIQUE  NOT NULL,
+  currency VARCHAR (3) CHECK (currency in ('USD', 'NGN')),
+  Balance NUMERIC (10,2) DEFAULT 0.00 NOT NULL CHECK (Balance >= 0),
+  type VARCHAR (10) CHECK (type in ('savings','current')),
   created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`;
   try{

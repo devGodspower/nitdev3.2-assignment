@@ -32,7 +32,9 @@ export const signupSchema = joi.object({
     .messages({
       'string.pattern.base': 'Password must contain an uppercase letter, a lowercase letter, a special character, and be at least 8 characters long',
       'any.required': 'Password is required'
-    })
+    }),
+    phonenumber: Joi.string().required().length(11).pattern(new RegExp('^(?=.*[0-9])'))
+
 });
 
 export const signinSchema = joi.object({
